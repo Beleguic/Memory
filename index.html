@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="utf-8"/>
+	<title> Memory </title>
+	<link rel="stylesheet" type="text/css" href="reset.css"/>
+
+</head>
+<body onload="main();">
+	<!-- Creation du tableau 4x4 pour le jeux -->
+	<!-- Chaque case dispose d'un nombre de 1 a 16, le nombre correspond au numeros de la case -->
+	<div id="divMain">
+		<div id="devTelephone">
+			<h1> Exercice 1 : Jeu "Memory" </h1>
+			<!-- Nombre de deplacement avec dans le span la valeur qui changeras -->
+			<p><span id="paireTel"> Nombre de paire trouvée: 0</span></p>
+			<p><span id="tentativeTel"> Nombre de tentative : 0</span></p>
+			<p><span id="notifPaireTel"> </span></p>
+			<p><span id="winOrLoseTel"> </span></p>
+		</div>
+		<div id="divTable">
+			<table>
+				<tr>
+					<td onclick="showPicture(0);"></td>
+					<td onclick="showPicture(1);"></td>
+					<td onclick="showPicture(2);"></td>
+					<td onclick="showPicture(3);"></td>
+				</tr>
+				<tr>
+					<td onclick="showPicture(4);"></td>
+					<td onclick="showPicture(5);"></td>
+					<td onclick="showPicture(6);"></td>
+					<td onclick="showPicture(7);"></td>
+				</tr>
+				<tr>
+					<td onclick="showPicture(8);"></td>
+					<td onclick="showPicture(9);"></td>
+					<td onclick="showPicture(10);"></td>
+					<td onclick="showPicture(11);"></td>
+				</tr>
+				<tr>
+					<td onclick="showPicture(12);"></td>
+					<td onclick="showPicture(13);"></td>
+					<td onclick="showPicture(14);"></td>
+					<td onclick="showPicture(15);"></td>
+				</tr>
+
+			</table>
+		</div>
+		<div id="divBouton">
+			<div id="devOrdi">
+				<h1> Exercice 1 : Jeu "Memory" </h1>
+				<!-- Nombre de deplacement avec dans le span la valeur qui changeras -->
+				<p><span id="paireOrdi"> Nombre de paire trouvée: 0</span></p>
+				<p><span id="tentativeOrdi"> Nombre de tentative : 0</span></p>
+				<p><span id="notifPaireOrdi"> </span></p>
+				<p><span id="winOrLoseOrdi"> </span></p>
+			</div>
+			<div id="divSpace">
+				<button onclick="reset();"> Commencer une nouvelle partie </button>
+				<button onclick="showTable();"> Dévoiler les cases </button>
+				<button id="nextExoA" onclick="window.location.href='http://thibault-beleguic.yo.fr/JS/Exo2/'">Exercice  2 : Slide Puzzle</button> 
+			</div>
+		</div>
+	</div>
+	
+	<footer>
+		
+		<p> Thibault Béléguic - LPI-WS </p>
+
+	</footer>
+
+	<script type="text/javascript">
+		
+		var case0 = document.getElementsByTagName('td'); // variable Globale contenant toute les cases td
+		var firstPicture = ["",""]; // variable Globale contenant les valeur de la premiere image selectionner
+		var secondPicture = ["",""]; // variable Globale contenant les valeur de la deuxieme image selectionner
+		var discoPaireCompte = 0; //Variable globale, compteur du nombre de paire decouverte
+		var nbrTentative = 0; // variable Globale, compteur du nombre de tentative
+		var table;	// variable Globale, contiendra la source des image aleatoire
+		var temoin = false; // varaible Globale, valeur boolean , false = le joueur peut retourner des carte, true = le joueur ne peut pas retourner des carte
+		var listeFindPaire = []; // variable Globale, contiendras la liste des pairs trouvé.
+
+		// fonction qui affiche toute les carte, elle est executé uniquement quand on appuie sur le bouton "Montrer les cartes"
+		function showTable(){
+
+			temoin = true;
+
+			for (var i = 0; i <= 15; i++) {
+					case0[i].innerHTML = "<img src='./img_exo/"+table[i]+".jpg'/>";
+					addStyle(i,"retourner");
+			}
+
+			var endTxtTel = document.getElementById("winOrLoseTel");
+			var endTxtOrdi = document.getElementById("winOrLoseOrdi");
+			endTxtTel.innerHTML = "Vous avez Perdu !";
+			endTxtTel.style.color = "red";
+			endTxtOrdi.innerHTML = "Vous avez Perdu !";
+			endTxtOrdi.style.color = "red";
+			var notifTxtTel = document.getElementById("notifPaireTel");
+			notifTxtTel.innerHTML = "Dommage ! Vous avez abandonné la partie !";
+			notifTxtTel.style.backgroundColor = "transparent";
+			notifTxtTel.style.color = "red";
+			var notifTxtOrdi = document.getElementById("notifPaireOrdi");
+			notifTxtOrdi.innerHTML = "Dommage ! Vous avez abandonné la partie !";
+			notifTxtOrdi.style.color = "red";
+			notifTxtOrdi.style.backgroundColor = "transparent";
+		}
+		
+
+		// fonction executé a chque click sur une case.
+		function showPicture(nbr){
+			
+			if (temoin == false && !checkIsFind(nbr)) {
+				if (firstPicture[0] == "") {
+					// attribution et retournement de la premiere carte	
+					firstPicture = getIdPicture(nbr);
+					addStyle(nbr,"retourner");
+				}
+				else{
+					if (firstPicture[1] != nbr) { 
+						// attribution et retournement de la deuxieme carte	
+						secondPicture = getIdPicture(nbr);
+						addStyle(nbr,"retourner");
+					}
+				}
+
+				if (firstPicture[0] != "" && secondPicture[0] != "" && firstPicture[1] != secondPicture[1]) { // Si les deux case selectionner contienne une source d'image, toute en etant sur deux cases differente.
+					addTentative(); // on ajoute une tentative
+					if (firstPicture[0] == secondPicture[0]) { 
+						temoin = true; // bloque le jeux le temps du processus
+						discoPaire();
+						if (listeFindPaire.length != 8) {
+							notifPaire(); 
+						}
+					}
+					else{
+						temoin = true; // bloque le jeux le temps du processus
+						hiddenNotifPaire();
+						setTimeout(hiddenPaire,1000); // execute la fonction pour cacher les 2 cases selectionner apres 1 seconde
+					}
+				}
+			}
+		}
+
+		// fonction qui regarde si le tableau contenant la liste des paires trouvé est = 8, elle affiche par la suite les message de victoire.
+		function checkWin(){
+			if (listeFindPaire.length == 8) {
+				var endTxtTel = document.getElementById("winOrLoseTel");
+				endTxtTel.innerHTML = "Vous avez Gagné !";
+				endTxtTel.style.color = "green";
+				var endTxtOrdi = document.getElementById("winOrLoseOrdi");
+				endTxtOrdi.innerHTML = "Vous avez Gagné !";
+				endTxtOrdi.style.color = "green";
+				var notifTxtTel = document.getElementById("notifPaireTel");
+				notifTxtTel.innerHTML = "Bravo! Vous avez trouvé toutes les paires !";
+				notifTxtTel.style.backgroundColor = "transparent";
+				notifTxtTel.style.color = "green";
+				var notifTxtOrdi = document.getElementById("notifPaireOrdi");
+				notifTxtOrdi.innerHTML = "Bravo! Vous avez trouvé toutes les paires !";
+				notifTxtOrdi.style.color = "green";
+				notifTxtOrdi.style.backgroundColor = "transparent";
+
+
+			}
+		}
+
+		// fonction qui affiche quand le joueur a trouvé une nouvelle paire.
+		function notifPaire(){
+
+			var notifTxtTel = document.getElementById("notifPaireTel");
+			notifTxtTel.innerHTML = "Bravo ! Vous avez trouvé une nouvelle paire !";
+			notifTxtTel.style.color = "white";
+			notifTxtTel.style.backgroundColor = "purple";
+			var notifTxtOrdi = document.getElementById("notifPaireOrdi");
+			notifTxtOrdi.innerHTML = "Bravo ! Vous avez trouvé une nouvelle paire !";
+			notifTxtOrdi.style.color = "white";
+			notifTxtOrdi.style.backgroundColor = "purple";
+
+		}
+
+
+		// fonction qui qui enleve la notification de victoire
+		function hiddenNotifPaire(){
+
+			var notifTxtTel = document.getElementById("notifPaireTel");
+			notifTxtTel.innerHTML = " ";
+			notifTxtTel.style.backgroundColor = "transparent";
+			var notifTxtOrdi = document.getElementById("notifPaireOrdi");
+			notifTxtOrdi.innerHTML = " ";
+			notifTxtOrdi.style.backgroundColor = "transparent";
+		}
+
+		//fonction qui regarde si la cases selectionner est deja trouvé ou non, renvoie true si la paire est deja trouvé et false si elle n'est pas trouvé
+		function checkIsFind(nbr){
+
+			var listePic = getIdPicture(nbr);
+			var img = listePic[0];
+			for (var i = 0; i <= listeFindPaire.length; i++) {
+				if(img == listeFindPaire[i]){
+					return true;
+				}
+			}
+			return false;
+		}
+
+		// fonction qui ajoute une tentative a chaque fois que le joueur clique sur deux cartes.
+		// elle affiche par la suite les differents messages
+		function addTentative(){
+
+			nbrTentative += 1;
+			var tentativeTel = document.getElementById('tentativeTel');
+			var tentativeOrdi = document.getElementById('tentativeOrdi');
+			if (nbrTentative > 1) {
+				tentativeTel.innerHTML = "Nombre de tentatives : "+nbrTentative;
+				tentativeOrdi.innerHTML = "Nombre de tentatives : "+nbrTentative;
+			}
+			else{
+				tentativeTel.innerHTML = "Nombre de tentative : "+nbrTentative;
+				tentativeOrdi.innerHTML = "Nombre de tentative : "+nbrTentative;
+			}
+		}
+
+		// fonction qui est execute lorsque une paire a été trouvé
+		// elle remet les variable de la premiere et de la deuxieme image selectionner pour ensuite afficher le nombre de paire trouvé.
+		function discoPaire(){
+
+			listeFindPaire.push(firstPicture[0]);
+			firstPicture = ["",""];
+			secondPicture = ["",""];
+			discoPaireCompte += 1;
+			var paireTel = document.getElementById('paireTel');
+			var paireOrdi = document.getElementById('paireOrdi');
+			if (discoPaireCompte > 1) {
+				paireTel.innerHTML = "Nombre de paires trouvées : "+discoPaireCompte;
+				paireOrdi.innerHTML = "Nombre de paires trouvées : "+discoPaireCompte;
+			}
+			else{
+				paireTel.innerHTML = "Nombre de paire trouvée : "+discoPaireCompte;
+				paireOrdi.innerHTML = "Nombre de paire trouvée : "+discoPaireCompte;
+			}
+			checkWin();
+			temoin = false; // debloque le jeux, fin du processus
+
+		}
+
+		// fonction qui est execute si deux cases sont selectionner mais que ce n'est pas une paire
+		// la fonction rechange la source de l'image en mettant en source l'image du dos de la carte.
+		function hiddenPaire(){
+
+			case0[firstPicture[1]].classList.remove("retourner");
+			case0[secondPicture[1]].classList.remove("retourner");
+			case0[firstPicture[1]].innerHTML = "<img src='./img_exo/cover.jpg'/>"; // met a jour la source de l'image
+			case0[secondPicture[1]].innerHTML = "<img src='./img_exo/cover.jpg'/>"; // met a jour la source de l'image
+			firstPicture = ["",""];
+			secondPicture = ["",""];
+			temoin = false; // debloque le jeux, fin du processus
+		}
+
+		//fonction qui montre la carte selectionner
+		// la fonction change la source de l'image de couverture par celle de la paire (elle retourne l'image)
+		// elle renvoie un tableau composé du numeros de la paire (aussi egale au numeros de l'image) ainsi que le numeros de la cases
+		// tableTemp[numeros de la paire, nuleros de la case]
+		function getIdPicture(nbr){
+			let img = table[nbr];
+			case0[nbr].innerHTML = "<img src='./img_exo/"+img+".jpg'/>";
+			let tableTemp = [];
+			tableTemp[0] = img;
+			tableTemp[1] = nbr;
+			return tableTemp;
+
+		}
+
+		// fonction qui ajoute un style a une case
+		function addStyle(nbr,style){
+
+			case0[nbr].classList.add(style);
+
+		}
+
+		// fonction qui enleve un style a une case
+		function removeStyle(nbr,style){
+
+			case0[nbr].classList.remove(style);
+
+		}
+
+		// fonction de melange du tableau contenant les paires.
+		function shuffle(table){
+			//On melange le tableau autant de fois que le nombre d'element dans le tableau
+			for (var i = 0; i <= 100; i++) {
+
+				var nbr1 = getNbrAlea(0,15);
+				var nbr2 = getNbrAlea(0,15);
+
+				var temp = table[nbr1];
+				table[nbr1] = table[nbr2];
+				table[nbr2] = temp;
+
+			}
+
+			return table;
+
+		}
+
+		// fonction qui retourne un nombre aleatoire entre un minimum et un maximum
+		function getNbrAlea(min,max){
+
+			min = Math.ceil(min);
+		    max = Math.floor(max);
+		    nbr = Math.floor(Math.random() * (max - min +1)) + min;
+
+		    return nbr;
+		
+		}
+
+		// fonction qui donne a chaque case la source de l'image de couverture.
+		function generateTable(table){
+
+			for (var i = 0; i <= 15; i++) {
+					case0[i].innerHTML = "<img src='./img_exo/cover.jpg'/>";
+					removeStyle(i,"retourner");
+			}
+		}
+
+		// fonction qui cree le tableau aleatoire contenent les paires
+		function arrayAlea(){
+			//declare un tableau composé de 8 paire de chiffre, chaque chiffre correspond a la source de l'image
+			table = [1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8];
+			//On passe le tableau dans la fonction "shuffle" pour le melanger
+			table = shuffle(table);
+			//On retourne le tableau melangé
+			return table;
+
+		}
+
+		// fonction d'initialisation du jeux
+		function main(){
+			// table = tbaleau melanger contenant le nuleors de chaque image
+			table = arrayAlea();
+			generateTable(table);
+
+		}
+
+		// fonction qui redemarre le jeux en relettant tout a zero
+		function reset(){
+
+			firstPicture = ["",""];
+			secondPicture = ["",""];
+			discoPaireCompte = 0;
+			nbrTentative = 0;
+			temoin = false;
+			listeFindPaire = [];
+
+			var tentativeTel = document.getElementById('tentativeTel');
+			tentativeTel.innerHTML = "Nombre de tentative : "+nbrTentative;
+			var tentativeOrdi = document.getElementById('tentativeOrdi');
+			tentativeOrdi.innerHTML = "Nombre de tentative : "+nbrTentative;
+
+			var paireTel = document.getElementById('paireTel');
+			paireTel.innerHTML = "Nombre de paire trouvée : "+discoPaireCompte;
+			var paireOrdi = document.getElementById('paireOrdi');
+			paireOrdi.innerHTML = "Nombre de paire trouvée : "+discoPaireCompte;
+
+			var endTxtTel = document.getElementById("winOrLoseTel");
+			endTxtTel.innerHTML = " ";
+			var endTxtOrdi = document.getElementById("winOrLoseOrdi");
+			endTxtOrdi.innerHTML = " ";
+
+			main();
+
+			location.href = "#top"; 
+
+		}
+
+	</script>
+
+	<style type="text/css">
+		@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap%27%27');
+
+		#divSpace{
+
+			margin-top: 50px;
+			display: flex;
+			padding-top: 10px;
+			border-top: solid;
+			border-width: 1px;
+			flex-direction: column; 
+			width: 100%;
+
+		}
+
+		#divMain{
+
+			display: flex;
+			width: 95%;
+			justify-content: space-around;
+
+		}
+
+		#divBouton{
+
+			display: flex;
+			flex-direction: column;
+			justify-content: space-around;
+			margin-top: 25px;
+			margin-bottom: 10px;
+			width: 40%;
+
+		}
+
+		body{
+
+			height:100vh;
+			display: flex;
+			flex-direction: column;
+			margin: 0;
+			background-image: url("./assets/image0.jpg"); /* The image used */
+  			background-color: #ffffff; /* Used if the image is unavailable */
+
+		}
+
+		h1{
+
+			text-align: center;
+			font-size: 280%;
+			margin: 20px;
+			font-family: 'Poppins', sans-serif;
+			color: black;
+
+
+		}
+
+		img{
+
+			width: 200px;
+
+		}
+
+		button{
+
+			margin: auto;
+			border-radius: 100px;
+			width: 70%;
+			padding: 25px;
+			text-decoration: none;
+			color: black;
+			background: rgba(0, 0, 0, 0);
+			border: solid;
+			border-color: black;
+			font-size: 150%;
+			font-family: 'Poppins', sans-serif;
+			margin-bottom: 20px;
+			margin-top: 10px;
+
+
+
+		}
+
+		button:hover{
+
+			cursor: pointer;
+			background-color: black;
+			color: white;
+
+		}
+
+		p{
+
+			text-align: center;
+			font-size: 180%;
+			margin: 10px;
+			font-family: 'Poppins', sans-serif;
+
+
+		}
+
+		td{
+
+			cursor: pointer;
+			line-height: 0;
+		}
+
+		div{
+
+			margin: auto;
+			text-align: center;
+			justify-content: center;
+			align-items: center;
+			vertical-align: middle;
+
+		}
+
+		table{
+
+			margin: auto;
+			border-spacing: 15px;
+			border-collapse: separate;
+			line-height: 0;
+		}
+
+
+		.retourner{
+
+			border: none;
+			cursor: not-allowed;
+		
+		}
+
+		#devOrdi{
+
+			display: block;
+
+		}
+
+		#devTelephone{
+
+			display: none;
+
+
+		}
+
+		@media screen and (max-width: 1450px){
+
+			h1{
+
+				font-size: 350%;
+
+			}
+
+			p{
+
+				font-size: 275%;
+
+			}
+
+			#divMain{
+
+				display: flex;
+				flex-direction: column;
+				margin-right: 5%;
+				margin-left: 5%;
+				width: 90%;
+
+			}
+
+
+			#divTable{
+
+				display: block;
+				width: 100%;
+
+			}
+
+			table {
+			    width: 100%;
+			    border-spacing: 1vh;
+			}
+
+			img{
+
+				width: 100%;
+
+			}
+
+			td{
+
+				width: 20%;
+
+
+			}
+
+			tr{
+
+
+				width: 100%;
+
+			}
+
+			button{
+
+				padding: 4%;
+				width: 75%;
+				font-size: 230%;
+				margin: 0;
+				margin-top: 4%;
+
+
+			}
+
+
+			#divBouton{
+
+				width: 100%;
+				margin-top: 0;
+
+
+
+			}
+
+			#divSpace{
+
+				margin: 0;
+				width: 100%;
+
+			}
+
+			#devOrdi{
+
+				display: none;
+
+			}
+
+			#devTelephone{
+
+				display: block;
+				width: 100%;
+
+			}
+
+			footer p{
+
+				font-size: 210%;
+
+			}
+		}
+
+		@media screen and (max-width: 1024px){
+
+			h1{
+
+				font-size: 250%;
+
+			}
+
+			p{
+
+				font-size: 200%;
+
+			}
+
+			#divMain{
+
+				display: flex;
+				flex-direction: column;
+				margin-right: 5%;
+				margin-left: 5%;
+				width: 90%;
+
+			}
+
+
+			#divTable{
+
+				display: block;
+				width: 100%;
+
+			}
+
+			table {
+			    width: 100%;
+			    border-spacing: 1vh;
+			}
+
+			img{
+
+				width: 100%;
+
+			}
+
+			td{
+
+				width: 20%;
+
+
+			}
+
+			tr{
+
+
+				width: 100%;
+
+			}
+
+			button{
+
+				padding: 4%;
+				width: 75%;
+				font-size: 150%;
+				margin: 0;
+				margin-top: 4%;
+
+
+			}
+
+
+			#divBouton{
+
+				width: 100%;
+				margin-top: 0;
+
+
+
+			}
+
+			#divSpace{
+
+				margin: 0;
+				width: 100%;
+
+			}
+
+			#devOrdi{
+
+				display: none;
+
+			}
+
+			#devTelephone{
+
+				display: block;
+				width: 100%;
+
+			}
+
+			footer p{
+
+				font-size: 160%;
+
+			}
+		}
+
+
+
+		@media screen and (max-width: 768px){
+
+			h1{
+
+				font-size: 200%;
+
+			}
+
+			p{
+
+				font-size: 150%;
+
+			}
+
+			#divMain{
+
+				display: flex;
+				flex-direction: column;
+				margin-right: 5%;
+				margin-left: 5%;
+				width: 90%;
+
+			}
+
+
+			#divTable{
+
+				display: block;
+				width: 100%;
+
+			}
+
+			table {
+			    width: 100%;
+			    border-spacing: 1vh;
+			}
+
+			img{
+
+				width: 100%;
+
+			}
+
+			td{
+
+				width: 20%;
+
+
+			}
+
+			tr{
+
+
+				width: 100%;
+
+			}
+
+			button{
+
+				padding: 3%;
+				width: 75%;
+				font-size: 100%;
+				margin: 0;
+				margin-top: 10px;
+
+
+			}
+
+
+			#divBouton{
+
+				width: 100%;
+				margin-top: 0;
+
+
+
+			}
+
+			#divSpace{
+
+				margin: 0;
+				width: 100%;
+
+			}
+
+			#devOrdi{
+
+				display: none;
+
+			}
+
+			#devTelephone{
+
+				display: block;
+				width: 100%;
+
+			}
+
+			footer p{
+
+				font-size: 110%;
+
+			}
+
+		}
+
+		
+	</style>
+</body>
+</html>
