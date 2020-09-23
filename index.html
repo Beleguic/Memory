@@ -81,6 +81,7 @@
 		var table;	// variable Globale, contiendra la source des image aleatoire
 		var temoin = false; // varaible Globale, valeur boolean , false = le joueur peut retourner des carte, true = le joueur ne peut pas retourner des carte
 		var listeFindPaire = []; // variable Globale, contiendras la liste des pairs trouvé.
+		var isWin = false;
 
 		// fonction qui affiche toute les carte, elle est executé uniquement quand on appuie sur le bouton "Montrer les cartes"
 		function showTable(){
@@ -91,21 +92,22 @@
 					case0[i].innerHTML = "<img src='./img_exo/"+table[i]+".jpg'/>";
 					addStyle(i,"retourner");
 			}
-
-			var endTxtTel = document.getElementById("winOrLoseTel");
-			var endTxtOrdi = document.getElementById("winOrLoseOrdi");
-			endTxtTel.innerHTML = "Vous avez Perdu !";
-			endTxtTel.style.color = "red";
-			endTxtOrdi.innerHTML = "Vous avez Perdu !";
-			endTxtOrdi.style.color = "red";
-			var notifTxtTel = document.getElementById("notifPaireTel");
-			notifTxtTel.innerHTML = "Dommage ! Vous avez abandonné la partie !";
-			notifTxtTel.style.backgroundColor = "transparent";
-			notifTxtTel.style.color = "red";
-			var notifTxtOrdi = document.getElementById("notifPaireOrdi");
-			notifTxtOrdi.innerHTML = "Dommage ! Vous avez abandonné la partie !";
-			notifTxtOrdi.style.color = "red";
-			notifTxtOrdi.style.backgroundColor = "transparent";
+			if(!isWin){
+				var endTxtTel = document.getElementById("winOrLoseTel");
+				var endTxtOrdi = document.getElementById("winOrLoseOrdi");
+				endTxtTel.innerHTML = "Vous avez Perdu !";
+				endTxtTel.style.color = "red";
+				endTxtOrdi.innerHTML = "Vous avez Perdu !";
+				endTxtOrdi.style.color = "red";
+				var notifTxtTel = document.getElementById("notifPaireTel");
+				notifTxtTel.innerHTML = "Dommage ! Vous avez abandonné la partie !";
+				notifTxtTel.style.backgroundColor = "transparent";
+				notifTxtTel.style.color = "red";
+				var notifTxtOrdi = document.getElementById("notifPaireOrdi");
+				notifTxtOrdi.innerHTML = "Dommage ! Vous avez abandonné la partie !";
+				notifTxtOrdi.style.color = "red";
+				notifTxtOrdi.style.backgroundColor = "transparent";
+			}
 		}
 		
 
@@ -147,6 +149,7 @@
 		// fonction qui regarde si le tableau contenant la liste des paires trouvé est = 8, elle affiche par la suite les message de victoire.
 		function checkWin(){
 			if (listeFindPaire.length == 8) {
+				isWin = true;
 				var endTxtTel = document.getElementById("winOrLoseTel");
 				endTxtTel.innerHTML = "Vous avez Gagné !";
 				endTxtTel.style.color = "green";
@@ -161,8 +164,6 @@
 				notifTxtOrdi.innerHTML = "Bravo! Vous avez trouvé toutes les paires !";
 				notifTxtOrdi.style.color = "green";
 				notifTxtOrdi.style.backgroundColor = "transparent";
-
-
 			}
 		}
 
