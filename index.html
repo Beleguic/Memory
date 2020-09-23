@@ -252,8 +252,8 @@
 
 			case0[firstPicture[1]].classList.remove("retourner");
 			case0[secondPicture[1]].classList.remove("retourner");
-			case0[firstPicture[1]].innerHTML = "<img src='./img_exo/cover.jpg'/>"; // met a jour la source de l'image
-			case0[secondPicture[1]].innerHTML = "<img src='./img_exo/cover.jpg'/>"; // met a jour la source de l'image
+			case0[firstPicture[1]].innerHTML = "<img src='./img_exo/cover.jpg' alt='Error'/>"; // met a jour la source de l'image
+			case0[secondPicture[1]].innerHTML = "<img src='./img_exo/cover.jpg' alt='Error'/>"; // met a jour la source de l'image
 			firstPicture = ["",""];
 			secondPicture = ["",""];
 			temoin = false; // debloque le jeux, fin du processus
@@ -265,7 +265,7 @@
 		// tableTemp[numeros de la paire, nuleros de la case]
 		function getIdPicture(nbr){
 			let img = table[nbr];
-			case0[nbr].innerHTML = "<img src='./img_exo/"+img+".jpg'/>";
+			case0[nbr].innerHTML = "<img src='./img_exo/"+img+".jpg' alt='Error'/>";
 			let tableTemp = [];
 			tableTemp[0] = img;
 			tableTemp[1] = nbr;
@@ -320,7 +320,7 @@
 		function generateTable(table){
 
 			for (var i = 0; i <= 15; i++) {
-					case0[i].innerHTML = "<img src='./img_exo/cover.jpg'/>";
+					case0[i].innerHTML = "<img src='./img_exo/cover.jpg' alt='Error'/>";
 					removeStyle(i,"retourner");
 			}
 		}
